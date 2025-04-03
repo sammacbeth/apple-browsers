@@ -53,9 +53,6 @@ public enum FeatureFlag: String {
     /// https://app.asana.com/0/1208592102886666/1208613627589762/f
     case crashReportOptInStatusResetting
 
-    /// https://app.asana.com/0/0/1208767141940869/f
-    case privacyProFreeTrialJan25
-
     /// https://app.asana.com/0/1206226850447395/1206307878076518
     case webViewStateRestoration
 
@@ -92,8 +89,6 @@ public enum FeatureFlag: String {
 extension FeatureFlag: FeatureFlagDescribing {
     public var cohortType: (any FeatureFlagCohortDescribing.Type)? {
         switch self {
-        case .privacyProFreeTrialJan25:
-            PrivacyProFreeTrialExperimentCohort.self
         case .privacyProOnboardingCTAMarch25:
             PrivacyProOnboardingCTAMarch25Cohort.self
         case .onboardingSetAsDefaultBrowser:
@@ -185,8 +180,6 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.feature(.adAttributionReporting))
         case .crashReportOptInStatusResetting:
             return .internalOnly()
-        case .privacyProFreeTrialJan25:
-            return .remoteReleasable(.subfeature(PrivacyProSubfeature.privacyProFreeTrialJan25))
         case .tabManagerMultiSelection:
             return .remoteReleasable(.subfeature(TabManagerSubfeature.multiSelection))
         case .webViewStateRestoration:
@@ -219,13 +212,6 @@ extension FeatureFlagger {
     public func isFeatureOn(_ featureFlag: FeatureFlag) -> Bool {
         return isFeatureOn(for: featureFlag)
     }
-}
-
-public enum PrivacyProFreeTrialExperimentCohort: String, FeatureFlagCohortDescribing {
-    /// Control cohort with no changes applied.
-    case control
-    /// Treatment cohort where the experiment modifications are applied.
-    case treatment
 }
 
 public enum PrivacyProOnboardingCTAMarch25Cohort: String, FeatureFlagCohortDescribing {
