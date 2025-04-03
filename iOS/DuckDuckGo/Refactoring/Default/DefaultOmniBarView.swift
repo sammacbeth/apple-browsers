@@ -145,15 +145,19 @@ class DefaultOmniBarView: UIView {
 
     private func configureAccessoryLongPressButton() {
 
+        accessoryButton.interactions.forEach {
+            accessoryButton.removeInteraction($0)
+        }
+
         if state.dependencies.featureFlagger.isFeatureOn(.customizableActionButton) &&
-            state.showPrivacyIcon {
+            state.showPrivacyIcon, omniDelegate?.isSERP == false {
             let interaction = UIContextMenuInteraction(delegate: self)
             accessoryButton.addInteraction(interaction)
             accessoryButton.layer.cornerRadius = 8
-        } else {
-            let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleShareLongPress(_:)))
-            longPressGesture.minimumPressDuration = 0.7
-            accessoryButton.addGestureRecognizer(longPressGesture)
+//        } else {
+//            let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleShareLongPress(_:)))
+//            longPressGesture.minimumPressDuration = 0.7
+//            accessoryButton.addGestureRecognizer(longPressGesture)
         }
 
     }
@@ -502,6 +506,8 @@ class DefaultOmniBarView: UIView {
     }
 
     func refreshText(forUrl url: URL?, forceFullURL: Bool = false) {
+        configureAccessoryLongPressButton()
+
         guard !textField.isEditing else { return }
         guard let url = url else {
             textField.text = nil
@@ -798,11 +804,6 @@ extension DefaultOmniBarView: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
 
         let deferred = UIDeferredMenuElement.uncached { [weak self] completion in
-            if self?.omniDelegate?.isSERP == true {
-                completion([])
-                return
-            }
-
             let children = OmniBarAccessoryType.allCases.map { accessoryType in
                 let image = switch accessoryType {
                 case .chat: UIImage(resource: .aiChat24)

@@ -215,7 +215,7 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(SyncSubfeature.exchangeKeysToSyncWithAnotherDevice))
 
         case .customizableActionButton:
-            return .internalOnly()
+            return .enabled // .internalOnly()
         }
     }
 }
