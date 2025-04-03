@@ -44,9 +44,6 @@ public protocol SubscriptionProduct: Equatable {
     /// The introductory offer associated with this subscription, if any.
     var introductoryOffer: SubscriptionProductIntroductoryOffer? { get }
 
-    /// A Boolean value that indicates whether the subscription product is one which relates to a Free Trial.
-    var isFreeTrialProduct: Bool { get }
-
     /// Asynchronously determines whether the user is eligible for an introductory offer.
     var isEligibleForIntroOffer: Bool { get async }
 
@@ -79,15 +76,6 @@ extension Product: SubscriptionProduct {
     /// Returns the introductory offer for this subscription if available.
     public var introductoryOffer: (any SubscriptionProductIntroductoryOffer)? {
         subscription?.introductoryOffer
-    }
-
-    /// A Boolean value that indicates whether the subscription product is one which relates to a Free Trial.
-    ///
-    /// This property returns `true` if the subscription has an associated introductory offer marked as a free trial
-    /// or if the subscription's identifier contains the designated free trial identifer.
-    /// If neither condition is met, the property returns `false`.
-    public var isFreeTrialProduct: Bool {
-        return subscription?.introductoryOffer?.isFreeTrial ?? false || id.contains(StoreSubscriptionConstants.freeTrialIdentifer)
     }
 
     /// Asynchronously checks if the user is eligible for an introductory offer.

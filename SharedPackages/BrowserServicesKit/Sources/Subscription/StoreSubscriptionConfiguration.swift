@@ -19,12 +19,6 @@
 import Foundation
 import Combine
 
-/// Constants relating to `StoreSubscriptionConfiguration`
-enum StoreSubscriptionConstants {
-    /// The Free Trial identifer included as part of a Subscription identifier, used to indicate that the subscription includes a free trial.
-    static let freeTrialIdentifer = "freetrial"
-}
-
 protocol StoreSubscriptionConfiguration {
     var allSubscriptionIdentifiers: [String] { get }
     func subscriptionIdentifiers(for country: String) -> [String]
@@ -42,9 +36,7 @@ final class DefaultStoreSubscriptionConfiguration: StoreSubscriptionConfiguratio
                   appIdentifier: "com.duckduckgo.mobile.ios",
                   environment: .production,
                   identifiersByRegion: [.usa: ["ddg.privacy.pro.monthly.renews.us",
-                                               "ddg.privacy.pro.yearly.renews.us",
-                                               "ddg.privacy.pro.monthly.renews.us.\(StoreSubscriptionConstants.freeTrialIdentifer)",
-                                               "ddg.privacy.pro.yearly.renews.us.\(StoreSubscriptionConstants.freeTrialIdentifer)"],
+                                               "ddg.privacy.pro.yearly.renews.us"],
                                         .restOfWorld: ["ddg.privacy.pro.monthly.renews.row",
                                                        "ddg.privacy.pro.yearly.renews.row"]]),
             // iOS debug Alpha build
@@ -52,9 +44,7 @@ final class DefaultStoreSubscriptionConfiguration: StoreSubscriptionConfiguratio
                   appIdentifier: "com.duckduckgo.mobile.ios.alpha",
                   environment: .staging,
                   identifiersByRegion: [.usa: ["ios.subscription.1month",
-                                               "ios.subscription.1year",
-                                               "ios.subscription.1month.\(StoreSubscriptionConstants.freeTrialIdentifer).dev",
-                                               "ios.subscription.1year.\(StoreSubscriptionConstants.freeTrialIdentifer).dev"],
+                                               "ios.subscription.1year"],
                                         .restOfWorld: ["ios.subscription.1month.row",
                                                        "ios.subscription.1year.row"]]),
             // macOS debug build
