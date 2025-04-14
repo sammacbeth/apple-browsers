@@ -75,14 +75,14 @@ public struct RemoteMessagingConfigMatcher {
                 return .nextMessage
             }
 
-            if let percentile = matchingRule.targetPercentile, let messagePercentile = percentile.before {
-                let userPercentile = percentileStore.percentile(forMessageId: messageID)
-
-                if userPercentile > messagePercentile {
-                    Logger.remoteMessaging.debug("Matching rule percentile check failed for message with ID \(messageID, privacy: .public)")
-                    return .fail
-                }
-            }
+//            if let percentile = matchingRule.targetPercentile, let messagePercentile = percentile.before {
+//                let userPercentile = percentileStore.percentile(forMessageId: messageID)
+//
+//                if userPercentile > messagePercentile {
+//                    Logger.remoteMessaging.debug("Matching rule percentile check failed for message with ID \(messageID, privacy: .public)")
+//                    return .fail
+//                }
+//            }
 
             result = .match
 
