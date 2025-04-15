@@ -338,7 +338,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         return true
     }
 
-    @available(macOS, introduced: 10.15, deprecated: 15.0)
+    //@available(macOS, introduced: 10.15, deprecated: 15.0)
     override public func handleNewUDPFlow(_ flow: NEAppProxyUDPFlow, initialRemoteEndpoint remoteEndpoint: NWEndpoint) -> Bool {
 
         guard let remoteEndpoint = remoteEndpoint as? NWHostEndpoint,
@@ -492,8 +492,8 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     }
 }
 
-@available(macOS 15, *)
-extension TransparentProxyProvider: NEAppProxyUDPFlowHandling {
+//@available(macOS 15, *)
+/*extension TransparentProxyProvider: NEAppProxyUDPFlowHandling {
 
     public func handleNewUDPFlow(_ flow: NEAppProxyUDPFlow, initialRemoteFlowEndpoint remoteEndpoint: Network.NWEndpoint) -> Bool {
 
@@ -504,7 +504,7 @@ extension TransparentProxyProvider: NEAppProxyUDPFlowHandling {
         logger.log(
             level: .debug,
             """
-            [UDP] New flow: \(String(describing: flow), privacy: .public)
+            [UDP] (2) New flow: \(String(describing: flow), privacy: .public)
             - remote: \(String(describing: remoteEndpoint), privacy: .public)
             - flowID: \(String(describing: flow.metaData.filterFlowIdentifier?.uuidString), privacy: .public)
             - appID: \(String(describing: flow.metaData.sourceAppSigningIdentifier), privacy: .public)
@@ -546,7 +546,7 @@ extension TransparentProxyProvider: NEAppProxyUDPFlowHandling {
 
         return true
     }
-}
+}*/
 
 // MARK: - Events & Pixels
 
