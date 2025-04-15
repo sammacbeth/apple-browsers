@@ -338,6 +338,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         return true
     }
 
+    @available(macOS, introduced: 10.15, deprecated: 15.0)
     override public func handleNewUDPFlow(_ flow: NEAppProxyUDPFlow, initialRemoteEndpoint remoteEndpoint: NWEndpoint) -> Bool {
 
         guard let remoteEndpoint = remoteEndpoint as? NWHostEndpoint,
@@ -438,6 +439,15 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         Int(endpoint.port) == Self.dnsPort
     }
 
+    private func isDnsServer(_ endpoint: Network.NWEndpoint) -> Bool {
+        switch endpoint {
+        case .hostPort(let host, let port):
+            return port.rawValue == Self.dnsPort
+        default:
+            return false
+        }
+    }
+
     // MARK: - VPN exclusions logic
 
     private enum FlowPath {
@@ -479,6 +489,62 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     override public func handleAppMessage(_ messageData: Data) async -> Data? {
         await appMessageHandler.handle(messageData)
+    }
+}
+
+@available(macOS 15, *)
+extension TransparentProxyProvider: NEAppProxyUDPFlowHandling {
+
+    public func handleNewUDPFlow(_ flow: NEAppProxyUDPFlow, initialRemoteFlowEndpoint remoteEndpoint: Network.NWEndpoint) -> Bool {
+
+        guard !isDnsServer(remoteEndpoint) else {
+            return false
+        }
+
+        logger.log(
+            level: .debug,
+            """
+            [UDP] New flow: \(String(describing: flow), privacy: .public)
+            - remote: \(String(describing: remoteEndpoint), privacy: .public)
+            - flowID: \(String(describing: flow.metaData.filterFlowIdentifier?.uuidString), privacy: .public)
+            - appID: \(String(describing: flow.metaData.sourceAppSigningIdentifier), privacy: .public)
+            """)
+
+        guard let interface else {
+            logger.error("[UDP: \(String(describing: flow), privacy: .public)] Expected an interface to exclude traffic through")
+            return false
+        }
+
+        switch path(for: flow) {
+        case .block(let reason):
+            switch reason {
+            case .appRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Blocking traffic due to app rule")
+            case .domainRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Blocking traffic due to domain rule")
+            }
+        case .excludeFromVPN(let reason):
+            switch reason {
+            case .appRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Excluding traffic due to app rule")
+            case .domainRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Excluding traffic due to domain rule")
+            }
+        case .routeThroughVPN:
+            return false
+        }
+
+        flow.networkInterface = directInterface
+
+        Task { @UDPFlowActor in
+            let flowManager = UDPFlowManager(flow: flow)
+            udpFlowManagers.insert(flowManager)
+
+            try? await flowManager.start(interface: interface)
+            udpFlowManagers.remove(flowManager)
+        }
+
+        return true
     }
 }
 
