@@ -88,7 +88,7 @@ class TabSwitcherBarsStateHandler {
             bottomBarItems = [
                 doneButton,
                 UIBarButtonItem.flexibleSpace(),
-                showAIChatButton ? UIBarButtonItem.fixedSpace(10.0) : nil,
+                showAIChatButton ? UIBarButtonItem.fixedSpace(16.0) : nil,
                 showAIChatButton ? UIBarButtonItem.flexibleSpace() : nil,
                 fireButton,
                 UIBarButtonItem.flexibleSpace(),
