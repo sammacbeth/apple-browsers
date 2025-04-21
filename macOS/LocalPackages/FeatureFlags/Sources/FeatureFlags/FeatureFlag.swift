@@ -81,6 +81,9 @@ public enum FeatureFlag: String, CaseIterable {
 
     /// https://app.asana.com/1/137249556945/project/72649045549333/task/1209227311680179?focus=true
     case tabCrashRecovery
+
+    /// https://app.asana.com/1/137249556945/project/72649045549333/task/1205508328452434?focus=true
+    case dbpRemoteBrokerDelivery
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -127,8 +130,9 @@ extension FeatureFlag: FeatureFlagDescribing {
                 .failsafeExampleCrossPlatformFeature,
                 .failsafeExamplePlatformSpecificSubfeature,
                 .visualRefresh,
-                .tabCrashDebugging,
-                .tabCrashRecovery:
+                .tabCrashDebugTools,
+                .tabCrashRecovery,
+                .dbpRemoteBrokerDelivery:
             return true
         case .debugMenu,
                 .sslCertificatesBypass,
@@ -198,6 +202,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .disabled
         case .tabCrashRecovery:
             return .remoteReleasable(.feature(.tabCrashRecovery))
+        case .dbpRemoteBrokerDelivery:
+            return .remoteReleasable(.subfeature(DBPSubfeature.remoteBrokerDelivery))
         }
     }
 }
