@@ -39,17 +39,23 @@ struct AutocompleteView: View {
             SuggestionsSection(suggestions: model.topHits,
                                query: model.query,
                                onSuggestionSelected: model.onSuggestionSelected,
-                               onSuggestionDeleted: model.deleteSuggestion)
+                               onSuggestionDeleted: model.deleteSuggestion,
+                               unselectedColor: Color(designSystemColor: .surface),
+                               itemSeparator: true)
 
             SuggestionsSection(suggestions: model.ddgSuggestions,
                                query: model.query,
                                onSuggestionSelected: model.onSuggestionSelected,
-                               onSuggestionDeleted: model.deleteSuggestion)
+                               onSuggestionDeleted: model.deleteSuggestion,
+                               unselectedColor: Color(designSystemColor: .background),
+                               itemSeparator: false)
 
             SuggestionsSection(suggestions: model.localResults,
                                query: model.query,
                                onSuggestionSelected: model.onSuggestionSelected,
-                               onSuggestionDeleted: model.deleteSuggestion)
+                               onSuggestionDeleted: model.deleteSuggestion,
+                               unselectedColor: Color(designSystemColor: .background),
+                               itemSeparator: false)
 
         }
         .offset(x: 0, y: -20)
@@ -157,7 +163,8 @@ private struct SuggestionsSection: View {
     var onSuggestionDeleted: (AutocompleteViewModel.SuggestionModel) -> Void
 
     let selectedColor = Color(designSystemColor: .accent)
-    let unselectedColor = Color(designSystemColor: .surface)
+    let unselectedColor: Color
+    let itemSeparator: Bool
 
     var body: some View {
         Section {
@@ -168,6 +175,7 @@ private struct SuggestionsSection: View {
                     SuggestionView(model: suggestions[index], query: query)
                  }
                  .listRowBackground(autocompleteViewModel.selection == suggestions[index] ? selectedColor : unselectedColor)
+                 .listRowSeparator(itemSeparator ? .automatic : .hidden)
                  .modifier(SwipeDeleteHistoryModifier(suggestion: suggestions[index], onSuggestionDeleted: onSuggestionDeleted))
             }
         }
@@ -332,6 +340,7 @@ private struct SuggestionListItem: View {
                     .tintIfAvailable(Color.secondary)
             }
         }
+        .padding(.horizontal, -14)
     }
 }
 
