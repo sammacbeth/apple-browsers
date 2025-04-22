@@ -88,12 +88,10 @@ class TabSwitcherBarsStateHandler {
             bottomBarItems = [
                 doneButton,
                 UIBarButtonItem.flexibleSpace(),
-                showAIChatButton ? UIBarButtonItem.fixedSpace(16.0) : nil,
-                showAIChatButton ? UIBarButtonItem.flexibleSpace() : nil,
                 fireButton,
                 UIBarButtonItem.flexibleSpace(),
                 showAIChatButton ? duckChatButton : nil,
-                showAIChatButton ? UIBarButtonItem.flexibleSpace() : nil,
+                showAIChatButton ? UIBarButtonItem.fixedSpace(12) : nil,
                 plusButton,
             ].compactMap { $0 }
             isBottomBarHidden = false
