@@ -72,6 +72,14 @@ class MainViewCoordinator {
         toolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
     }
 
+    func hideNavigationBar() {
+        navigationBarContainer.isHidden = true
+    }
+
+    func showNavigationBar() {
+        navigationBarContainer.isHidden = false
+    }
+
     class Constraints {
 
         var navigationBarContainerTop: NSLayoutConstraint!

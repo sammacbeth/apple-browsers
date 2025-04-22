@@ -560,6 +560,8 @@ class MainViewController: UIViewController {
                                                name: UIResponder.keyboardWillChangeFrameNotification,
                                                object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide),
                                                name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow),
@@ -578,10 +580,22 @@ class MainViewController: UIViewController {
     }
 
     @objc
+    private func keyboardWillShow() {
+        if !omniBar.isTextFieldEditing {
+            UIView.animate(withDuration: 0.3) {
+                self.viewCoordinator.hideNavigationBar()
+            }
+        }
+    }
+
+    @objc
     private func keyboardWillHide() {
         if !didSendGestureDismissPixel, newTabPageViewController?.isDragging == true, keyboardShowing {
             Pixel.fire(pixel: .addressBarGestureDismiss)
             didSendGestureDismissPixel = true
+        }
+        UIView.animate(withDuration: 0.3) {
+            self.viewCoordinator.showNavigationBar()
         }
     }
 
