@@ -78,6 +78,8 @@ public enum FeatureFlag: String, CaseIterable {
     /// https://app.asana.com/1/137249556945/project/72649045549333/task/1209227311680179?focus=true
     case tabCrashRecovery
 
+    /// https://app.asana.com/1/137249556945/project/72649045549333/task/1210081345713964?focus=true
+    case syncSetupBarcodeIsUrlBased
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -114,7 +116,8 @@ extension FeatureFlag: FeatureFlagDescribing {
                 .exchangeKeysToSyncWithAnotherDevice,
                 .visualRefresh,
                 .tabCrashDebugTools,
-                .tabCrashRecovery:
+                .tabCrashRecovery,
+                .syncSetupBarcodeIsUrlBased:
             return true
         case .debugMenu,
                 .sslCertificatesBypass,
@@ -180,6 +183,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .disabled
         case .tabCrashRecovery:
             return .remoteReleasable(.feature(.tabCrashRecovery))
+        case .syncSetupBarcodeIsUrlBased:
+            return .disabled
         }
     }
 }

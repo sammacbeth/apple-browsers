@@ -95,6 +95,9 @@ public enum FeatureFlag: String {
 
     /// https://app.asana.com/0/72649045549333/1209633877674689/f
     case exchangeKeysToSyncWithAnotherDevice
+
+    /// https://app.asana.com/1/137249556945/project/72649045549333/task/1210081345713964?focus=true
+    case syncSetupBarcodeIsUrlBased
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -122,7 +125,8 @@ extension FeatureFlag: FeatureFlagDescribing {
                 .privacyProAuthV2,
                 .scamSiteProtection,
                 .maliciousSiteProtection,
-                .exchangeKeysToSyncWithAnotherDevice:
+                .exchangeKeysToSyncWithAnotherDevice,
+                .syncSetupBarcodeIsUrlBased:
             return true
         case .onboardingSetAsDefaultBrowser:
             if #available(iOS 18.3, *) {
@@ -221,6 +225,8 @@ extension FeatureFlag: FeatureFlagDescribing {
             return .remoteReleasable(.subfeature(OnboardingSubfeature.setAsDefaultBrowserExperiment))
         case .exchangeKeysToSyncWithAnotherDevice:
             return .remoteReleasable(.subfeature(SyncSubfeature.exchangeKeysToSyncWithAnotherDevice))
+        case .syncSetupBarcodeIsUrlBased:
+            return .disabled
         }
     }
 }
