@@ -1235,7 +1235,7 @@ public extension DataBroker {
                 maintenanceScan: 0,
                 maxAttempts: -1
             ),
-            optOutUrl: "", 
+            optOutUrl: "",
             eTag: ""
         )
     }
@@ -1980,7 +1980,7 @@ public extension DataBroker {
                 maxAttempts: -1
             ),
             parent: "some",
-            optOutUrl: "", 
+            optOutUrl: "",
             eTag: ""
         )
     }
