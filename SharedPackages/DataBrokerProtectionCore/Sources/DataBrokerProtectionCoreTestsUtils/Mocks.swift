@@ -1352,7 +1352,7 @@ public final class MockDataBrokerOperation: DataBrokerOperation, @unchecked Send
 
     public override func main() {
         if shouldError {
-            errorDelegate?.dataBrokerOperationDidError(DataBrokerProtectionError.noActionFound, withBrokerName: nil)
+            errorDelegate?.dataBrokerOperationDidError(DataBrokerProtectionError.noActionFound, withBrokerName: nil, version: nil)
         }
 
         finish()
@@ -1396,7 +1396,7 @@ public final class MockDataBrokerOperationErrorDelegate: DataBrokerOperationErro
 
     public init() {}
 
-    public func dataBrokerOperationDidError(_ error: any Error, withBrokerName brokerName: String?) {
+    public func dataBrokerOperationDidError(_ error: any Error, withBrokerName brokerName: String?, version: String?) {
         operationErrors.append(error)
     }
 }
