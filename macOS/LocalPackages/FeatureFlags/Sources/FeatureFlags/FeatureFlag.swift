@@ -130,7 +130,7 @@ extension FeatureFlag: FeatureFlagDescribing {
                 .failsafeExampleCrossPlatformFeature,
                 .failsafeExamplePlatformSpecificSubfeature,
                 .visualRefresh,
-                .tabCrashDebugTools,
+                .tabCrashDebugging,
                 .tabCrashRecovery,
                 .dbpRemoteBrokerDelivery:
             return true
