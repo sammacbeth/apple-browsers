@@ -131,8 +131,7 @@ extension FeatureFlag: FeatureFlagDescribing {
                 .failsafeExamplePlatformSpecificSubfeature,
                 .visualRefresh,
                 .tabCrashDebugging,
-                .tabCrashRecovery,
-                .dbpRemoteBrokerDelivery:
+                .tabCrashRecovery:
             return true
         case .debugMenu,
                 .sslCertificatesBypass,
@@ -141,7 +140,8 @@ extension FeatureFlag: FeatureFlagDescribing {
                 .contextualOnboarding,
                 .unknownUsernameCategorization,
                 .credentialsImportPromotionForExistingUsers,
-                .maliciousSiteProtection:
+                .maliciousSiteProtection,
+                .dbpRemoteBrokerDelivery:
             return false
         }
     }
