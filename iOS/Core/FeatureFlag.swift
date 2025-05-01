@@ -98,6 +98,9 @@ public enum FeatureFlag: String {
 
     /// https://app.asana.com/1/137249556945/project/72649045549333/task/1210081345713964?focus=true
     case syncSetupBarcodeIsUrlBased
+
+    /// https://app.asana.com/1/137249556945/project/72649045549333/task/1210081345713964?focus=true
+    case syncCanScanURLBasedBarcodes
 }
 
 extension FeatureFlag: FeatureFlagDescribing {
@@ -126,7 +129,8 @@ extension FeatureFlag: FeatureFlagDescribing {
                 .scamSiteProtection,
                 .maliciousSiteProtection,
                 .exchangeKeysToSyncWithAnotherDevice,
-                .syncSetupBarcodeIsUrlBased:
+                .syncSetupBarcodeIsUrlBased,
+                .syncCanScanURLBasedBarcodes:
             return true
         case .onboardingSetAsDefaultBrowser:
             if #available(iOS 18.3, *) {
@@ -226,6 +230,8 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .exchangeKeysToSyncWithAnotherDevice:
             return .remoteReleasable(.subfeature(SyncSubfeature.exchangeKeysToSyncWithAnotherDevice))
         case .syncSetupBarcodeIsUrlBased:
+            return .disabled
+        case .syncCanScanURLBasedBarcodes:
             return .disabled
         }
     }
