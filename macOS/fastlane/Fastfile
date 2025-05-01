@@ -629,7 +629,7 @@ release in progress and you're making a follow-up internal release that includes
   # - Commits and pushes
   #
   private_lane :macos_update_embedded_files do |options|
-    sh("cd #{PROJECT_ROOT_FOLDER} && ./scripts/update_embedded.sh")
+    sh("cd #{PROJECT_ROOT_FOLDER} && DBP_API_AUTH_TOKEN='#{ENV['DBP_API_AUTH_TOKEN']}' ./scripts/update_embedded.sh")
 
     # Verify no unexpected files were modified
     result = sh('git', 'status')
