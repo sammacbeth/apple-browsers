@@ -74,6 +74,8 @@ public protocol SyncConnectionControlling {
      */
     func stopConnectMode()
 
+    func startPairingMode(_ pairingInfo: PairingInfo) async
+
     /**
      Handles a scanned or pasted key and starts excange, recovery or connect flow
      */
@@ -136,6 +138,26 @@ final public class SyncConnectionController: SyncConnectionControlling {
     public func stopConnectMode() {
         self.connector?.stopPolling()
         self.connector = nil
+    }
+
+    public func startPairingMode(_ pairingInfo: PairingInfo) async {
+        let syncCode: SyncCode
+        do {
+            syncCode = try SyncCode.decodeBase64String(pairingInfo.base64Code)
+        } catch {
+            await delegate?.controllerDidError(.unableToRecognizeCode, underlyingError: error)
+            return
+        }
+
+        await delegate?.controllerDidRecognizeScannedCode()
+
+        if let exchangeKey = syncCode.exchangeKey {
+            _ = await handleExchangeKey(exchangeKey)
+        } else if let connectKey = syncCode.connect {
+            _ = await handleConnectKey(connectKey)
+        } else {
+            await delegate?.controllerDidError(.unableToRecognizeCode, underlyingError: nil)
+        }
     }
 
     @discardableResult

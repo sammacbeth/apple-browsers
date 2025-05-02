@@ -259,6 +259,7 @@ class SyncSettingsViewController: UIHostingController<SyncSettingsView> {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         Pixel.fire(pixel: .settingsSyncOpen)
+        startPairingIfNecessary()
     }
 
     func updateOptions() {
@@ -309,6 +310,14 @@ class SyncSettingsViewController: UIHostingController<SyncSettingsView> {
         })
     }
 
+    private func startPairingIfNecessary() {
+        if let pairingInfo {
+            Task {
+                await connectionController.startPairingMode(pairingInfo)
+            }
+            self.pairingInfo = nil
+        }
+    }
 }
 
 extension SyncSettingsViewController: ScanOrPasteCodeViewModelDelegate {
