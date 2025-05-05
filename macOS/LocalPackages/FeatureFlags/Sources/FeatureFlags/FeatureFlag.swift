@@ -203,7 +203,8 @@ extension FeatureFlag: FeatureFlagDescribing {
         case .tabCrashRecovery:
             return .remoteReleasable(.feature(.tabCrashRecovery))
         case .dbpRemoteBrokerDelivery:
-            return .remoteReleasable(.subfeature(DBPSubfeature.remoteBrokerDelivery))
+            /// TODO: To be revert back to .remoteReleasable
+            return .enabled
         }
     }
 }
