@@ -21,7 +21,8 @@ UPGRADABLE_EMBEDDED_FILES = [
   'DuckDuckGo/ContentBlocker/AppTrackerDataSetProvider.swift',
   'DuckDuckGo/ContentBlocker/trackerData.json',
   'DuckDuckGo/ContentBlocker/AppPrivacyConfigurationDataProvider.swift',
-  'DuckDuckGo/ContentBlocker/macos-config.json'
+  'DuckDuckGo/ContentBlocker/macos-config.json',
+  '../SharedPackages/DataBrokerProtectionCore/Sources/DataBrokerProtectionCore/Resources/JSON/*.json'
 ].freeze
 
 default_platform(:mac)
@@ -332,6 +333,13 @@ platform :mac do
     sh('git', 'push')
   end
 
+  # Updates embedded files locally, run unit tests (unless in CI), and commit without pushing to remote.
+  # For testing purposes only.
+  #
+  lane :test_update_embedded_files do |options|
+    macos_update_embedded_files
+  end
+
   # Updates marketing version to the specified one and increments build number by 1.
   #
   # @option [String] version Marketing version string.
@@ -629,23 +637,24 @@ release in progress and you're making a follow-up internal release that includes
   # - Commits and pushes
   #
   private_lane :macos_update_embedded_files do |options|
-    sh("cd #{PROJECT_ROOT_FOLDER} && DBP_API_AUTH_TOKEN='#{ENV['DBP_API_AUTH_TOKEN']}' ./scripts/update_embedded.sh")
+    sh("cd #{PROJECT_ROOT_FOLDER} && ./scripts/update_embedded.sh")
 
-    # Verify no unexpected files were modified
-    result = sh('git', 'status')
-    modified_files = result.split("\n").select { |line| line.include?('modified:') }
-    modified_files = modified_files.map { |str| str.split(':')[1].strip }
-    nopref_modified_files = modified_files.map { |str| str.delete_prefix('../') }
-    nopref_modified_files.each do |modified_file|
-      UI.abort_with_message!("Unexpected change to #{modified_file}.") unless UPGRADABLE_EMBEDDED_FILES.any? do |s|
-        s.include?(modified_file)
+    # Verify no unexpected files were modified or added
+    result = sh('git', 'status', '-s')
+    modified_files = result.split("\n")
+      .select { |line| line.start_with?(' M') || line.start_with?('??') }
+      .map { |line| line.split(' ', 2)[1] }
+    nopref_files = modified_files.map { |str| str.delete_prefix('../') }
+    nopref_files.each do |file|
+      UI.abort_with_message!("Unexpected change to #{file}.") unless UPGRADABLE_EMBEDDED_FILES.any? do |pattern|
+        File.fnmatch?(pattern, file)
       end
     end
 
     # Run tests (CI will run them separately)
     run_tests(scheme: 'macOS Browser') unless is_ci
 
-    # Every thing looks good: commit and push
+    # Every thing looks good: commit
     unless modified_files.empty?
       modified_files.each { |modified_file| sh('git', 'add', modified_file.to_s) }
       sh('git', 'commit', '-m', 'Update embedded files')

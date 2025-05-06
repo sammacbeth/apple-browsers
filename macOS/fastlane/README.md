@@ -127,6 +127,14 @@ Executes the hotfix release preparation work in the repository
 
 Updates embedded files and pushes to remote.
 
+### mac test_update_embedded_files
+
+```sh
+[bundle exec] fastlane mac test_update_embedded_files
+```
+
+
+
 ### mac set_version
 
 ```sh
