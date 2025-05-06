@@ -20,6 +20,7 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct PreparingToSyncView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
     var body: some View {
         SyncDialog(spacing: 20.0, bottomText: UserText.preparingToSyncDialogAction) {
@@ -32,6 +33,10 @@ struct PreparingToSyncView: View {
             }
             .frame(width: 320)
         } buttons: {
+            Button(UserText.cancel) {
+                model.endFlow()
+            }
+            .buttonStyle(DismissActionButtonStyle())
         }
     }
 

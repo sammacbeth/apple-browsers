@@ -43,14 +43,16 @@ struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
                 .foregroundColor(Color(NSColor.separatorColor))
                 .padding(.bottom, 16.0)
 
-            HStack {
+            ZStack {
                 if let bottomText {
-                    Spacer()
                     Text(bottomText)
                         .foregroundColor(Color(.blackWhite60))
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
-                Spacer()
-                buttons()
+                HStack {
+                    Spacer()
+                    buttons()
+                }
             }
             .padding(.horizontal, 20.0)
         }
