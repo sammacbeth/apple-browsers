@@ -83,7 +83,7 @@ struct OnboardingPrivacyProPromotionHelper: OnboardingPrivacyProPromotionHelping
     ///
     /// This property checks if the feature flag is enabled and if the user can purchase a subscription.
     var shouldDisplay: Bool {
-        featureFlagger.isFeatureOn(for: FeatureFlag.privacyProOnboardingPromotion, allowOverride: true) && subscriptionManager.canPurchase
+        true && subscriptionManager.canPurchase
     }
 
     /// Provides the URL components for redirecting as part of the onboarding promotion experiment.
