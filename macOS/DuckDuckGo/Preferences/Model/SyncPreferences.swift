@@ -927,7 +927,7 @@ extension SyncPreferences: SyncConnectionControllerDelegate {
     }
 
     func controllerDidRecognizeScannedCode() async {
-        // no-op
+        presentDialog(for: .prepareToSync)
     }
 
     func controllerDidCreateSyncAccount() {
