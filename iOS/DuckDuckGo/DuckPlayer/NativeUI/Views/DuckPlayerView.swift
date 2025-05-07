@@ -162,14 +162,14 @@ struct DuckPlayerView: View {
         )
         .onFirstAppear {
             viewModel.onFirstAppear()
-            autoOpenOnYoutube = viewModel.autoOpenOnYoutube            
+            autoOpenOnYoutube = viewModel.autoOpenOnYoutube
         }
         .onAppear {
             viewModel.onAppear()
         }
         .onDisappear {
             viewModel.onDisappear()
-        }        
+        }
     }
 
     @ViewBuilder
