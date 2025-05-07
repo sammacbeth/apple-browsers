@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/duckduckgo/fastlane-plugin-ddg_apple_automation
-  revision: d26ec170db80e2a680be437c367f7887839c00d0
+  revision: 0c3ff2b147eb4248b3cfc540a515343c9c0d0cc7
   branch: anh/update_embedded_dbp_broker_jsons
   specs:
     fastlane-plugin-ddg_apple_automation (2.2.4)
