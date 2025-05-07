@@ -179,7 +179,7 @@ struct DuckPlayerView: View {
                 RoundedRectangle(cornerRadius: Constants.uiElementRadius)
                     .fill(Constants.uiElementsBackground)
                 HStack(spacing: 8) {
-                    Text(verbatim: "Auto-open Duck Player on Youtube")
+                    Text(verbatim: "Open YouTube videos here")
                         .daxBodyRegular()
                         .foregroundColor(.white)
                     Spacer()
@@ -207,7 +207,7 @@ struct DuckPlayerView: View {
                     viewModel.openInYouTube()
                 } label: {
                     HStack(spacing: LayoutConstants.defaultSpacing) {
-                        Text(verbatim: "Watch in Youtube")
+                        Text(verbatim: "Watch on Youtube")
                             .daxBodyRegular()
                             .foregroundColor(.white)
                         Spacer()
@@ -276,7 +276,7 @@ struct DuckPlayerView: View {
    @ViewBuilder
   private var bubbleContent: some View {
     VStack(alignment: .leading, spacing: LayoutConstants.defaultSpacing) {
-        Text(verbatim: "You're watching in Duck Player!\nNo targeted ads here.")
+        Text(verbatim: "You’re watching in Duck Player!\nNo targeted ads here.")
             .daxHeadline()
             .foregroundColor(.white)
             .lineLimit(2)

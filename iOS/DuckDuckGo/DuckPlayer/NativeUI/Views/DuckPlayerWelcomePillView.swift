@@ -100,7 +100,7 @@ struct DuckPlayerWelcomePillView: View {
                 phoneView
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(verbatim: "YouTube, but with fewer ads, and more privacy.")
+                    Text(verbatim: "YouTube, but with fewer ads and more privacy")
                         .foregroundColor(Color(designSystemColor: .textPrimary))
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)

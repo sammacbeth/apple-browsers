@@ -344,7 +344,7 @@ final class DuckPlayerNativeUIPresenter {
 
     @MainActor
     private func presentDismissCountToast() {
-        var message = AttributedString("Want to turn off Duck Player appearing on Youtube?")
+        var message = AttributedString("You can turn off Duck Player anytime")
         message.foregroundColor = .white
         displayToast(
             with: message,

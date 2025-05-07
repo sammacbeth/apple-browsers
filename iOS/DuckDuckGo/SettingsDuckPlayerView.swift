@@ -88,21 +88,21 @@ struct SettingsDuckPlayerView: View {
             if viewModel.isInternalUser && UIDevice.current.userInterfaceIdiom == .phone {
 
                 if viewModel.appSettings.duckPlayerNativeUI {
-                    Section(footer: Text(verbatim: "Clicking on YouTube videos in DuckDuckGo search results will open in Duck Player.")) {
+                    Section(footer: Text(verbatim: "Clicking on YouTube videos from DuckDuckGo search results will open in Duck Player.")) {
                         SettingsCellView(label: "DuckDuckGo Search Results",
                                         accessory: .toggle(isOn: viewModel.duckPlayerNativeUISERPEnabled))
                                         .disabled(viewModel.shouldDisplayDuckPlayerContingencyMessage)
                     }
 
-                    Section(footer: Text(verbatim: "Choose how you would like Duck Player to handle YouTube videos when navigating from the YouTube website.")) {
-                       SettingsPickerCellView(label: "Use on Youtube.com",
+                    Section(footer: Text(verbatim: "Clicking on YouTube videos when browsing YouTube.com will open in Duck Player.")) {
+                       SettingsPickerCellView(label: "YouTube.com",
                                         options: NativeDuckPlayerYoutubeMode.allCases,
                                         selectedOption: viewModel.duckPlayerNativeYoutubeModeBinding)
                                         .disabled(viewModel.shouldDisplayDuckPlayerContingencyMessage)
                     }
 
-                    Section(footer: Text(verbatim: "Videos opened in Duck Player will automatically begin playback. Turn this off if you would like to manually start playback of videos opened in Duck Player")) {
-                        SettingsCellView(label: "Autoplay Videos",
+                    Section(footer: Text(verbatim: "Videos opened in Duck Player will automatically begin playback. Turn this off if you would like to manually start playback of videos opened in Duck Player.")) {
+                        SettingsCellView(label: "Auto-play videos",
                                         accessory: .toggle(isOn: viewModel.duckPlayerAutoplay))
                                         .disabled(viewModel.shouldDisplayDuckPlayerContingencyMessage)
                     }
