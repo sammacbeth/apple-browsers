@@ -34,6 +34,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../BrowserServicesKit"),
+        .package(path: "../FeatureFlags"),
         .package(url: "https://github.com/weichsel/ZIPFoundation.git", exact: "0.9.19"),
     ],
     targets: [
@@ -44,6 +45,7 @@ let package = Package(
                 .product(name: "PixelKit", package: "BrowserServicesKit"),
                 .product(name: "Configuration", package: "BrowserServicesKit"),
                 .product(name: "Persistence", package: "BrowserServicesKit"),
+                .product(name: "FeatureFlags", package: "FeatureFlags"),
                 "ZIPFoundation",
             ],
             resources: [.copy("Resources")],
