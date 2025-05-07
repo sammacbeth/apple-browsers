@@ -101,7 +101,7 @@ performDBPBrokerUpdate() {
 	fi
 
 	printf "Downloading DBP broker JSONs...\n"
-	curl -H "Authorization: Bearer $DBP_API_AUTH_TOKEN" -L "$file_url" -o "$dbp_zip"
+	curl -s -H "Authorization: Bearer $DBP_API_AUTH_TOKEN" -L "$file_url" -o "$dbp_zip"
 
 	rm -rf "$dbp_extract_dir"
 	mkdir "$dbp_extract_dir"
