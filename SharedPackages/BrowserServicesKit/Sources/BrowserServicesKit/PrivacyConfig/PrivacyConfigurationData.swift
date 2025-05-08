@@ -364,7 +364,7 @@ public struct PrivacyConfigurationData {
 // MARK: Encoding Functions
 extension PrivacyConfigurationData {
     /// Returns a dictionary representation of the configuration.
-    public func toJSONDictionary() -> [String: Any] {
+    public func toJSONDictionary(excludeFeatures: [String] = []) -> [String: Any] {
         var json = [String: Any]()
 
         if let version = self.version {
@@ -374,10 +374,15 @@ extension PrivacyConfigurationData {
         json[CodingKeys.unprotectedTemporary.rawValue] = self.unprotectedTemporary.map { $0.toJSONDictionary() }
 
         var featuresDict = [String: Any]()
-        if let allowlistJSON = trackerAllowlist.toTrackerAllowListJSONDictionary() {
-            featuresDict[CodingKeys.trackerAllowlist.rawValue] = allowlistJSON
+        if !excludeFeatures.contains("trackerAllowlist") {
+            if let allowlistJSON = trackerAllowlist.toTrackerAllowListJSONDictionary() {
+                featuresDict[CodingKeys.trackerAllowlist.rawValue] = allowlistJSON
+            }
         }
         for (key, feature) in features {
+            if excludeFeatures.contains(key) {
+                continue
+            }
             if let featureJSON = feature.toJSONDictionary() {
                 featuresDict[key] = featureJSON
             }
@@ -388,8 +393,8 @@ extension PrivacyConfigurationData {
     }
 
     /// Returns the JSON Data representation.
-    public func toJSONData() throws -> Data {
-        let jsonDict = self.toJSONDictionary()
+    public func toJSONData(excludeFeatures: [String] = []) throws -> Data {
+        let jsonDict = self.toJSONDictionary(excludeFeatures: excludeFeatures)
         return try JSONSerialization.data(withJSONObject: jsonDict, options: [])
     }
 }

@@ -46,7 +46,7 @@ public struct ContentScopePrivacyConfigurationJSONGenerator: CustomisedPrivacyCo
 
         let newFeatures = updatedFeatureState(config: config.features)
         let newConfig = PrivacyConfigurationData(features: newFeatures, unprotectedTemporary: config.unprotectedTemporary, trackerAllowlist: config.trackerAllowlist, version: config.version)
-        return try? newConfig.toJSONData()
+        return try? newConfig.toJSONData(excludeFeatures: ["trackerAllowlist", "autoconsent"])
     }
 
     /// Updates the feature states in the configuration based on the content scope experiments experiment cohorts.
