@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import UserScript
 import PrivacyDashboard
+import PixelKit
 import os.log
 
 protocol AutoconsentUserScriptDelegate: AnyObject {
@@ -78,7 +79,6 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     func userContentController(_ userContentController: WKUserContentController,
                                didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
-        Logger.autoconsent.debug("Message received: \(String(describing: message.body))")
         return handleMessage(replyHandler: replyHandler, message: message)
     }
 }
@@ -94,6 +94,7 @@ extension AutoconsentUserScript {
         case selfTestResult
         case autoconsentDone
         case autoconsentError
+        case report
     }
 
     struct InitMessage: Codable {
@@ -149,6 +150,19 @@ extension AutoconsentUserScript {
         let isCosmetic: Bool
     }
 
+    struct ReportState: Codable {
+        let lifecycle: String
+        let detectedCmps: [String]
+        let heuristicPatterns: [String]
+        let heuristicSnippets: [String]
+    }
+
+    struct ReportMessage: Codable {
+        let type: String
+        let instanceId: String
+        let state: ReportState
+    }
+
     func decodeMessageBody<Input: Any, Target: Codable>(from message: Input) -> Target? {
         do {
             let json = try JSONSerialization.data(withJSONObject: message)
@@ -191,8 +205,13 @@ extension AutoconsentUserScript {
             handleAutoconsentDone(message: message, replyHandler: replyHandler)
         case MessageName.autoconsentError:
             Logger.autoconsent.error("Autoconsent error: \(String(describing: message.body))")
+            self.fireEvent(event: .errorMultiplePopups)
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+        case MessageName.report:
+            handleAutoconsentReport(message: message)
+            replyHandler([ "type": "ok" ], nil)
         }
+
     }
 
     func matchDomainList(domain: String?, domainsList: [String]) -> Bool {
@@ -239,6 +258,9 @@ extension AutoconsentUserScript {
         guard config.isFeature(.autoconsent, enabledForDomain: topURLDomain) else {
             Logger.autoconsent.info("disabled for site: \(String(describing: url.absoluteString))")
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+            if message.frameInfo.isMainFrame {
+                fireEvent(event: .disabledForSite)
+            }
             return
         }
 
@@ -251,6 +273,7 @@ extension AutoconsentUserScript {
                 optoutFailed: nil,
                 selftestFailed: nil
             )
+            self.fireEvent(event: .acInit)
         }
         let remoteConfig = self.config.settings(for: .autoconsent)
         let disabledCMPs = remoteConfig["disabledCMPs"] as? [String] ?? []
@@ -282,10 +305,10 @@ extension AutoconsentUserScript {
                 "enableCosmeticRules": true,
                 "detectRetries": 20,
                 "isMainWorld": false,
-                "enableFilterList": enableFilterList
+                "enableFilterList": enableFilterList,
+                "enableHeuristicDetection": true
             ] as [String: Any?]
         ] as [String: Any?]
-        Logger.autoconsent.debug("autoconsent config: \(String(describing: autoconsentConfig))")
 
         replyHandler(autoconsentConfig, nil)
     }
@@ -339,6 +362,7 @@ extension AutoconsentUserScript {
             return
         }
         Logger.autoconsent.debug("Cookie popup found: \(String(describing: messageData))")
+        self.fireEvent(event: .popupFound)
 
         // if popupFound is sent with "filterList", it indicates that cosmetic filterlist matched in the prehide stage,
         // but a real opt-out may still follow. See https://github.com/duckduckgo/autoconsent/blob/main/api.md#messaging-api
@@ -369,6 +393,7 @@ extension AutoconsentUserScript {
 
         if !messageData.result {
             refreshDashboardState(consentManaged: true, cosmetic: nil, optoutFailed: true, selftestFailed: nil)
+            fireEvent(event: .errorOptoutFailed)
         } else if messageData.scheduleSelfTest {
             // save a reference to the webview and frame for self-test
             selfTestWebView = message.webView
@@ -392,6 +417,7 @@ extension AutoconsentUserScript {
         Logger.autoconsent.debug("opt-out successful: \(String(describing: messageData))")
 
         refreshDashboardState(consentManaged: true, cosmetic: messageData.isCosmetic, optoutFailed: false, selftestFailed: nil)
+        fireEvent(event: messageData.isCosmetic ? .doneCosmetic : .done)
 
         // trigger popup once per domain
         if !management.sitesNotifiedCache.contains(host) {
@@ -403,6 +429,7 @@ extension AutoconsentUserScript {
                     "topUrl": self.topUrl ?? url,
                     "isCosmetic": messageData.isCosmetic
                 ])
+                fireEvent(event: messageData.isCosmetic ? .animationShownCosmetic : .animationShown)
             }
         }
 
@@ -443,6 +470,126 @@ extension AutoconsentUserScript {
         Logger.autoconsent.debug("self-test result: \(String(describing: messageData))")
         refreshDashboardState(consentManaged: true, cosmetic: nil, optoutFailed: false, selftestFailed: messageData.result)
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
+        fireEvent(event: messageData.result ? .selfTestOk : .selfTestFail)
     }
 
+    @MainActor
+    func handleAutoconsentReport(message: WKScriptMessage) {
+        guard let report: ReportMessage = decodeMessageBody(from: message.body) else {
+            assertionFailure("Received a malformed message from autoconsent")
+            return
+        }
+        let heuristicMatch = report.state.heuristicPatterns.count > 0 || report.state.heuristicSnippets.count > 0
+
+        if report.state.lifecycle == "nothingDetected" && heuristicMatch  {
+            fireEvent(event: .missedPopup)
+            return
+        }
+        if message.isMainFrame && heuristicMatch && !management.heuristicMatchCache.contains(report.instanceId) {
+            management.heuristicMatchCache.insert(report.instanceId)
+            fireEvent(event: .heuristicMatch)
+        }
+        if message.isMainFrame && heuristicMatch && report.state.detectedCmps.count > 0 && !management.heuristicMatchDetected.contains(report.instanceId) {
+            management.heuristicMatchDetected.insert(report.instanceId)
+            fireEvent(event: .heuristicDetected)
+        }
+    }
+
+    func fireEvent(event: AutoconsentPixel, frame: Bool = false) -> Void {
+        if management.eventCounter.isEmpty {
+            // start collection time window once the first event arrives
+            management.lastEventSent = Int(Date().timeIntervalSince1970)
+        }
+        if Int(Date().timeIntervalSince1970) - management.lastEventSent > 60*5 {
+            // Send aggregated counts after 15mins
+            PixelKit.fire(AutoconsentPixel.summary(events: management.eventCounter), frequency: .standard)
+            management.eventCounter = [:]
+            management.lastEventSent = Int(Date().timeIntervalSince1970)
+            management.heuristicMatchCache.removeAll()
+            management.heuristicMatchDetected.removeAll()
+        }
+        // increment counter
+        self.management.eventCounter[event.key, default: 0] += 1
+
+        Logger.autoconsent.error("xxx: \(self.management.eventCounter)")
+
+        // fire daily pixel if needed
+        PixelKit.fire(event, frequency: .daily)
+    }
+
+}
+
+enum AutoconsentPixel: PixelKitEventV2 {
+
+    case acInit
+    case missedPopup
+    case errorMultiplePopups
+    case errorOptoutFailed
+    case popupFound
+    case done
+    case doneCosmetic
+    case animationShown
+    case animationShownCosmetic
+    case disabledForSite
+    case heuristicMatch
+    case heuristicDetected
+    case selfTestOk
+    case selfTestFail
+
+    case summary(events: [String: Int])
+
+    static var summaryPixels = [AutoconsentPixel] (
+        arrayLiteral: .acInit,
+        .missedPopup,
+        .errorMultiplePopups,
+        .errorOptoutFailed,
+        .popupFound,
+        .done,
+        .doneCosmetic,
+        .animationShown,
+        .animationShownCosmetic,
+        .disabledForSite,
+        .heuristicMatch,
+        .heuristicDetected,
+        .selfTestOk,
+        .selfTestFail
+    )
+
+    var name: String {
+        switch self {
+        case .acInit: "autoconsent_init"
+        case .missedPopup: "autoconsent_missed-popup"
+        case .errorMultiplePopups: "autoconsent_multiple-popups"
+        case .errorOptoutFailed: "autoconsent_error_optout"
+        case .popupFound: "autoconsent_popup-found"
+        case .done: "autoconsent_done"
+        case .doneCosmetic: "autoconsent_done_cosmetic"
+        case .animationShown: "autoconsent_animation-shown"
+        case .animationShownCosmetic: "autoconsent_animation-shown_cosmetic"
+        case .disabledForSite: "autoconsent_disabled-for-site"
+        case .heuristicDetected: "autoconsent_heuristic-detected"
+        case .heuristicMatch: "autoconsent_heuristic-match"
+        case .selfTestOk: "autoconsent_self-test-ok"
+        case .selfTestFail: "autoconsent_self-test-fail"
+        case .summary: "autoconsent_summary"
+        }
+    }
+
+    var key: String {
+        return String(name.dropFirst(12))
+    }
+
+    var parameters: [String: String]? {
+        switch self {
+        case let .summary(events):
+            Dictionary(uniqueKeysWithValues: AutoconsentPixel.summaryPixels.map { pixel in
+            (pixel.key, "\(events[pixel.key] ?? 0)")
+            })
+        default: [:]
+        }
+    }
+
+    var error: (any Error)? {
+        nil
+    }
 }

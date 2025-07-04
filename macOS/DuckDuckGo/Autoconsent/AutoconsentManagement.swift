@@ -23,9 +23,17 @@ final class AutoconsentManagement {
 
     var sitesNotifiedCache = Set<String>()
 
+    var eventCounter = [String: Int]()
+    var lastEventSent = 0
+    
+    var heuristicMatchCache = Set<String>()
+    var heuristicMatchDetected = Set<String>()
+
     func clearCache() {
         dispatchPrecondition(condition: .onQueue(.main))
         sitesNotifiedCache.removeAll()
+        heuristicMatchCache.removeAll()
+        heuristicMatchDetected.removeAll()
     }
 
 }
