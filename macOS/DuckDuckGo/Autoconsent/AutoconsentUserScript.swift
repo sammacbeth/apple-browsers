@@ -499,14 +499,14 @@ extension AutoconsentUserScript {
         if management.eventCounter.isEmpty {
             // start collection time window once the first event arrives
             management.lastEventSent = Int(Date().timeIntervalSince1970)
-        }
-        if Int(Date().timeIntervalSince1970) - management.lastEventSent > 60*5 {
-            // Send aggregated counts after 15mins
-            PixelKit.fire(AutoconsentPixel.summary(events: management.eventCounter), frequency: .standard)
-            management.eventCounter = [:]
-            management.lastEventSent = Int(Date().timeIntervalSince1970)
-            management.heuristicMatchCache.removeAll()
-            management.heuristicMatchDetected.removeAll()
+            DispatchQueue.global().asyncAfter(deadline: .now() + 60*2) {
+                Logger.autoconsent.error("xxx run delayed")
+                PixelKit.fire(AutoconsentPixel.summary(events: self.management.eventCounter), frequency: .standard)
+                self.management.eventCounter = [:]
+                self.management.lastEventSent = Int(Date().timeIntervalSince1970)
+                self.management.heuristicMatchCache.removeAll()
+                self.management.heuristicMatchDetected.removeAll()
+            }
         }
         // increment counter
         self.management.eventCounter[event.key, default: 0] += 1
