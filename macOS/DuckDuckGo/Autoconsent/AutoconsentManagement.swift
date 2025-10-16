@@ -17,9 +17,16 @@
 //
 
 import Foundation
+import AppKit
 
 final class AutoconsentManagement {
     static let shared = AutoconsentManagement()
+
+    init() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            self.installAutoconsentExtension()
+        }
+    }
 
     var sitesNotifiedCache = Set<String>()
 
@@ -35,6 +42,22 @@ final class AutoconsentManagement {
         detectedByPatternsCache.removeAll()
         detectedByBothCache.removeAll()
         detectedOnlyRulesCache.removeAll()
+    }
+
+    @MainActor
+    func installAutoconsentExtension() {
+        if #available(macOS 15.4, *),
+           let webExtensionManager = NSApp.delegateTyped.webExtensionManager {
+            let extensionPath = "file:///Users/sammacbeth/code/autoconsent/dist/addon-mv3"
+            // Only install if not already installed
+            if !webExtensionManager.webExtensionPaths.contains(extensionPath) {
+                Task {
+                    await webExtensionManager.installExtension(path: extensionPath)
+                }
+            }
+            let webext = webExtensionManager.loadedExtensions.first?.webExtension
+
+        }
     }
 
 }
