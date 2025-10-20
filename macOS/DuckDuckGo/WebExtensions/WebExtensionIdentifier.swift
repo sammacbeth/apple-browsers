@@ -21,6 +21,7 @@ import Foundation
 @available(macOS 15.4, *)
 enum WebExtensionIdentifier: String {
     case bitwarden
+    case autoconsent
 
     static func identify(bundle: Bundle) -> WebExtensionIdentifier? {
         guard let bundleId = bundle.bundleIdentifier else {
@@ -40,6 +41,8 @@ enum WebExtensionIdentifier: String {
         switch self {
         case .bitwarden:
             "file:///Applications/Bitwarden.app/Contents/PlugIns/safari.appex"
+        case .autoconsent:
+            "file:///na"
         }
     }
 }

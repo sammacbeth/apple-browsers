@@ -434,7 +434,7 @@ extension WebExtensionManager: WKWebExtensionControllerDelegate {
 
         popupPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
     }
-/*
+
     func webExtensionController(_ controller: WKWebExtensionController, sendMessage message: Any, toApplicationWithIdentifier applicationIdentifier: String?, for extensionContext: WKWebExtensionContext) async throws -> Any? {
 
         try await nativeMessagingCoordinator.webExtensionController(controller,
@@ -446,7 +446,7 @@ extension WebExtensionManager: WKWebExtensionControllerDelegate {
     func webExtensionController(_ controller: WKWebExtensionController, connectUsing port: WKWebExtension.MessagePort, for extensionContext: WKWebExtensionContext) async throws {
 
         try nativeMessagingCoordinator.webExtensionController(controller, connectUsingMessagePort: port, for: extensionContext)
-    }*/
+    }
 }
 
 @available(macOS 15.4, *)

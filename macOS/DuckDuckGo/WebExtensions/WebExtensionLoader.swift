@@ -60,7 +60,7 @@ final class WebExtensionLoader: WebExtensionLoading {
             webExtension = try await WKWebExtension(appExtensionBundle: bundle)
         } else {
             // Detect known extension based on bundle
-            extensionIdentifier = WebExtensionIdentifier.bitwarden
+            extensionIdentifier = WebExtensionIdentifier.autoconsent
             webExtension = try await WKWebExtension(resourceBaseURL: extensionURL)
         }
 

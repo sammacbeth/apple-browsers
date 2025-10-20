@@ -25,6 +25,9 @@ final class NativeMessagingHandlerFactory {
         switch extensionIdentifier {
         case .bitwarden:
             return BitwardenNativeMessagingHandler()
+        case .autoconsent:
+            return AutoconsentNativeMessagingHandler()
         }
+
     }
 }

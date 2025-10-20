@@ -18,6 +18,7 @@
 
 import Foundation
 import AppKit
+import WebKit
 
 final class AutoconsentManagement {
     static let shared = AutoconsentManagement()
@@ -55,9 +56,44 @@ final class AutoconsentManagement {
                     await webExtensionManager.installExtension(path: extensionPath)
                 }
             }
-            let webext = webExtensionManager.loadedExtensions.first?.webExtension
-
+            guard let context = webExtensionManager.loadedExtensions.first else {
+                return
+            }
         }
+    }
+
+}
+
+@available(macOS 15.4, *)
+final class AutoconsentNativeMessagingHandler: NativeMessagingHandling {
+
+    static let newSitePopupHiddenNotification = Notification.Name("newSitePopupHidden")
+
+    @MainActor
+    func handleMessage(_ message: Any, to applicationIdentifier: String?, for extensionContext: WKWebExtensionContext) async throws -> Any? {
+        switch applicationIdentifier {
+        case "showAnimation":
+            if let message = message as? [String: String], let url = message["url"] {
+                NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
+                    "topUrl": url,
+                    "isCosmetic": false
+                ])
+                return true
+            }
+            return false
+        case "test":
+            print("xxx Test message received")
+            return nil
+        default:
+            return nil
+        }
+//        if let message = message as? [String: Any] {
+//            print("xxx \(String(describing: applicationIdentifier))")
+//
+//        }
+    }
+
+    func handleConnection(using port: WKWebExtension.MessagePort, for extensionContext: WKWebExtensionContext) throws {
     }
 
 }
