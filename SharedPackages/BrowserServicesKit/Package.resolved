@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts.git",
       "state" : {
-        "revision" : "ecbc2145c275088c3e7b8c7396ea584c1bba173f",
-        "version" : "13.1.0"
+        "revision" : "6f987af8900400107f133c9ce9ed050b96523910",
+        "version" : "13.2.0"
       }
     },
     {
@@ -37,6 +37,15 @@
       }
     },
     {
+      "identity" : "opentelemetry-swift-core",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/open-telemetry/opentelemetry-swift-core.git",
+      "state" : {
+        "revision" : "5c03a26e5226a94f4de492e3d449a87f1bdb7ced",
+        "version" : "2.4.0"
+      }
+    },
+    {
       "identity" : "privacy-dashboard",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
@@ -61,6 +70,15 @@
       "state" : {
         "revision" : "810496cf121e525d660cd0ea89a758740476b85f",
         "version" : "1.5.1"
+      }
+    },
+    {
+      "identity" : "swift-atomics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-atomics.git",
+      "state" : {
+        "revision" : "b601256eab081c0f92f059e12818ac1d4f178ff7",
+        "version" : "1.3.0"
       }
     },
     {

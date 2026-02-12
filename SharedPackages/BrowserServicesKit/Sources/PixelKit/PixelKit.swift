@@ -165,6 +165,9 @@ public final class PixelKit {
     }
 
     public static func tearDown() {
+        if let instance = shared {
+            clearPixelMetricsFactoryCache(for: instance)
+        }
         shared = nil
     }
 
@@ -188,6 +191,22 @@ public final class PixelKit {
         self.defaults = defaults
         self.fireRequest = fireRequest
         logger.debug("👾 PixelKit initialised: dryRun: \(self.dryRun, privacy: .public) appVersion: \(self.appVersion, privacy: .public) source: \(self.source ?? "-", privacy: .public) defaultHeaders: \(self.defaultHeaders, privacy: .public) pixelCalendar: \(self.pixelCalendar, privacy: .public)")
+    }
+
+    // MARK: - Pixel metrics (internal for use by PixelMetrics extension)
+
+    var pixelMetricsAppVersion: String { appVersion }
+    var pixelMetricsSource: String? { source }
+    var pixelMetricsDefaults: UserDefaults { defaults }
+
+    // MARK: - Aggregated pixel (metrics)
+
+    /// Fires an aggregated metric pixel. Uses the same code path as `fire(_:frequency:)` so
+    /// platform prefix/suffix and default parameters (appVersion, etc.) are applied.
+    /// Used by PixelMetricExporter. Frequency is always `.standard`.
+    func fireAggregatedPixel(name: String, parameters: [String: String], onComplete: @escaping CompletionBlock = { _, _ in }) {
+        let event = WideEventPixelKitEvent(name: name, parameters: parameters, standardParameters: [])
+        fire(event, frequency: .standard, withAdditionalParameters: nil, onComplete: onComplete)
     }
 
     // MARK: - Public Fire

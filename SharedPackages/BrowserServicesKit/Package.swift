@@ -65,6 +65,7 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-clocks.git", exact: "1.0.6"),
         .package(url: "https://github.com/duckduckgo/content-scope-scripts.git", exact: "13.2.0"),
         .package(path: "../URLPredictor"),
+        .package(url: "https://github.com/open-telemetry/opentelemetry-swift-core.git", from: "2.3.0"),
     ],
     targets: [
         .binaryTarget(
@@ -428,7 +429,8 @@ let package = Package(
         .target(
             name: "PixelKit",
             dependencies: [
-                "Common"
+                "Common",
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
             ],
             exclude: [
                 "README.md"
